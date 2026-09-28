@@ -36,6 +36,35 @@
   }
 }
 
+.search-box {
+  max-width: 280px;
+  min-width: 200px;
+
+  .form-control:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+  }
+
+  .input-group-text {
+    color: #94a3b8;
+  }
+}
+
+.toast-success {
+  animation: fade-in 0.2s ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .task-card {
   border-radius: 1rem;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -74,4 +103,10 @@
 .empty-icon {
   font-size: 2.75rem;
   color: #94a3b8;
+}
+
+.empty-state {
+  border: 1px dashed #dde3f0;
+  border-radius: 1rem;
+  background: #fafbff;
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -20,9 +20,10 @@ type FilterStatus = TaskStatus | 'ALL';
   templateUrl: './task-board.component.html',
   styleUrl: './task-board.component.scss',
 })
-export class TaskBoardComponent implements OnInit {
+export class TaskBoardComponent implements OnInit, OnDestroy {
   private readonly tasksApi = inject(TaskService);
   private readonly fb = inject(FormBuilder);
+  private successTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly statuses = TASK_STATUSES;
   readonly statusLabels = STATUS_LABELS;
@@ -35,6 +36,7 @@ export class TaskBoardComponent implements OnInit {
 
   tasks: Task[] = [];
   filter: FilterStatus = 'ALL';
+  searchQuery = '';
   loading = false;
   saving = false;
   errorMessage = '';
@@ -52,11 +54,22 @@ export class TaskBoardComponent implements OnInit {
     this.loadTasks();
   }
 
-  get filteredTasks(): Task[] {
-    if (this.filter === 'ALL') {
-      return this.tasks;
+  ngOnDestroy(): void {
+    if (this.successTimer) {
+      clearTimeout(this.successTimer);
     }
-    return this.tasks.filter((t) => t.status === this.filter);
+  }
+
+  get filteredTasks(): Task[] {
+    const q = this.searchQuery.trim().toLowerCase();
+    return this.tasks.filter((t) => {
+      const statusOk = this.filter === 'ALL' || t.status === this.filter;
+      const searchOk =
+        !q ||
+        t.title.toLowerCase().includes(q) ||
+        (t.description ?? '').toLowerCase().includes(q);
+      return statusOk && searchOk;
+    });
   }
 
   get counts(): Record<TaskStatus | 'ALL', number> {
@@ -87,12 +100,15 @@ export class TaskBoardComponent implements OnInit {
     this.filter = value;
   }
 
+  clearSearch(): void {
+    this.searchQuery = '';
+  }
+
   openCreate(): void {
     this.editingId = null;
     this.form.reset({ title: '', description: '', status: 'TODO' });
     this.showForm = true;
-    this.successMessage = '';
-    this.errorMessage = '';
+    this.clearFlash();
   }
 
   openEdit(task: Task): void {
@@ -103,8 +119,7 @@ export class TaskBoardComponent implements OnInit {
       status: task.status,
     });
     this.showForm = true;
-    this.successMessage = '';
-    this.errorMessage = '';
+    this.clearFlash();
   }
 
   cancelForm(): void {
@@ -136,7 +151,7 @@ export class TaskBoardComponent implements OnInit {
         this.saving = false;
         this.showForm = false;
         this.editingId = null;
-        this.successMessage = isCreate ? 'Task created.' : 'Task updated.';
+        this.flashSuccess(isCreate ? 'Task created.' : 'Task updated.');
         this.loadTasks();
       },
       error: (err: HttpErrorResponse) => {
@@ -159,7 +174,7 @@ export class TaskBoardComponent implements OnInit {
       .subscribe({
         next: (updated) => {
           this.tasks = this.tasks.map((t) => (t.id === updated.id ? updated : t));
-          this.successMessage = `Moved “${updated.title}” to ${STATUS_LABELS[status]}.`;
+          this.flashSuccess(`Moved “${updated.title}” to ${STATUS_LABELS[status]}.`);
         },
         error: (err: HttpErrorResponse) => {
           this.errorMessage = this.extractError(err, 'Could not update status.');
@@ -174,7 +189,7 @@ export class TaskBoardComponent implements OnInit {
     this.tasksApi.delete(task.id).subscribe({
       next: () => {
         this.tasks = this.tasks.filter((t) => t.id !== task.id);
-        this.successMessage = 'Task deleted.';
+        this.flashSuccess('Task deleted.');
       },
       error: (err: HttpErrorResponse) => {
         this.errorMessage = this.extractError(err, 'Could not delete task.');
@@ -190,6 +205,27 @@ export class TaskBoardComponent implements OnInit {
         return 'badge-progress';
       case 'DONE':
         return 'badge-done';
+    }
+  }
+
+  private flashSuccess(message: string): void {
+    this.successMessage = message;
+    this.errorMessage = '';
+    if (this.successTimer) {
+      clearTimeout(this.successTimer);
+    }
+    this.successTimer = setTimeout(() => {
+      this.successMessage = '';
+      this.successTimer = null;
+    }, 3500);
+  }
+
+  private clearFlash(): void {
+    this.successMessage = '';
+    this.errorMessage = '';
+    if (this.successTimer) {
+      clearTimeout(this.successTimer);
+      this.successTimer = null;
     }
   }
 

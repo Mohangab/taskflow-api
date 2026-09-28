@@ -15,7 +15,7 @@
     <button type="button" class="btn-close" aria-label="Dismiss" (click)="errorMessage = ''"></button>
   </div>
 
-  <div *ngIf="successMessage" class="alert alert-success d-flex align-items-start" role="alert">
+  <div *ngIf="successMessage" class="alert alert-success d-flex align-items-start toast-success" role="status">
     <i class="bi bi-check-circle-fill me-2 mt-1"></i>
     <div class="flex-grow-1">{{ successMessage }}</div>
     <button type="button" class="btn-close" aria-label="Dismiss" (click)="successMessage = ''"></button>
@@ -69,18 +69,39 @@
     </div>
   </div>
 
-  <!-- Filters -->
-  <div class="filter-bar d-flex flex-wrap gap-2 mb-4">
-    <button
-      *ngFor="let f of filters"
-      type="button"
-      class="btn btn-sm filter-chip"
-      [class.active]="filter === f.value"
-      (click)="setFilter(f.value)"
-    >
-      {{ f.label }}
-      <span class="count">{{ counts[f.value] }}</span>
-    </button>
+  <!-- Filters + search -->
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div class="filter-bar d-flex flex-wrap gap-2">
+      <button
+        *ngFor="let f of filters"
+        type="button"
+        class="btn btn-sm filter-chip"
+        [class.active]="filter === f.value"
+        (click)="setFilter(f.value)"
+      >
+        {{ f.label }}
+        <span class="count">{{ counts[f.value] }}</span>
+      </button>
+    </div>
+    <div class="search-box input-group input-group-sm">
+      <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+      <input
+        type="search"
+        class="form-control border-start-0"
+        placeholder="Search title or description…"
+        [(ngModel)]="searchQuery"
+        aria-label="Search tasks"
+      />
+      <button
+        *ngIf="searchQuery"
+        type="button"
+        class="btn btn-outline-secondary"
+        (click)="clearSearch()"
+        title="Clear search"
+      >
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
   </div>
 
   <!-- Loading -->
@@ -92,13 +113,25 @@
   <!-- Empty -->
   <div *ngIf="!loading && filteredTasks.length === 0" class="empty-state text-center py-5">
     <i class="bi bi-inbox empty-icon"></i>
-    <h2 class="h5 mt-3">No tasks here</h2>
+    <h2 class="h5 mt-3">
+      {{ searchQuery.trim() ? 'No matches' : 'No tasks here' }}
+    </h2>
     <p class="text-muted">
-      {{ filter === 'ALL' ? 'Create your first task to get started.' : 'Nothing matches this filter.' }}
+      <ng-container *ngIf="searchQuery.trim(); else noSearch">
+        Nothing matches “{{ searchQuery.trim() }}”. Try another phrase or clear the search.
+      </ng-container>
+      <ng-template #noSearch>
+        {{ filter === 'ALL' ? 'Create your first task to get started.' : 'Nothing matches this filter.' }}
+      </ng-template>
     </p>
-    <button *ngIf="filter === 'ALL'" type="button" class="btn btn-outline-primary" (click)="openCreate()">
-      <i class="bi bi-plus-lg me-1"></i> New task
-    </button>
+    <div class="d-flex justify-content-center gap-2 flex-wrap">
+      <button *ngIf="searchQuery.trim()" type="button" class="btn btn-outline-secondary" (click)="clearSearch()">
+        Clear search
+      </button>
+      <button *ngIf="filter === 'ALL' && !searchQuery.trim()" type="button" class="btn btn-outline-primary" (click)="openCreate()">
+        <i class="bi bi-plus-lg me-1"></i> New task
+      </button>
+    </div>
   </div>
 
   <!-- Task list -->
