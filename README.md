@@ -1,8 +1,20 @@
 # TaskFlow API
 
-> A production-style **Task Management REST API** built with **Spring Boot 3**, **JWT authentication**, and **role-based access control (RBAC)**. Designed to maintain and schedule tasks.
+[![CI](https://github.com/Mohangab/taskflow-api/actions/workflows/ci.yml/badge.svg)](https://github.com/Mohangab/taskflow-api/actions/workflows/ci.yml)
+[![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3-brightgreen?logo=springboot)](https://spring.io/projects/spring-boot)
+[![Angular](https://img.shields.io/badge/Angular-19-red?logo=angular)](https://angular.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+> A production-style **Task Management REST API** built with **Spring Boot 3**, **JWT authentication**, and **role-based access control (RBAC)**. Includes an **Angular 19** SPA in `frontend/`.
 
 **Author:** Kola Mohan Venkatesh ([@Mohangab](https://github.com/Mohangab))
+
+| | |
+|---|---|
+| API + Swagger | http://localhost:8080 · [Swagger UI](http://localhost:8080/swagger-ui.html) |
+| Angular SPA | http://localhost:4200 — see [Frontend](#frontend-angular) |
+| Docker | `docker compose up --build` |
 
 ---
 
