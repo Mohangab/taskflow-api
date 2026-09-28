@@ -102,7 +102,7 @@ com.taskflow
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| `GET` | `/api/tasks` | JWT | List tasks (own / all for ADMIN) |
+| `GET` | `/api/tasks` | JWT | List tasks (own / all for ADMIN); optional `?status=` & `?q=` title search |
 | `GET` | `/api/tasks/{id}` | JWT | Get one task |
 | `POST` | `/api/tasks` | JWT | Create task |
 | `PUT` | `/api/tasks/{id}` | JWT | Update task |
@@ -216,8 +216,8 @@ curl -s -X POST http://localhost:8080/api/tasks \
   -H "Content-Type: application/json" \
   -d '{"title":"Ship portfolio project","description":"Finish TaskFlow API README","status":"TODO"}'
 
-# 4) List tasks
-curl -s http://localhost:8080/api/tasks \
+# 4) List tasks (optional: ?status=TODO&q=portfolio)
+curl -s 'http://localhost:8080/api/tasks?status=TODO&q=portfolio' \
   -H "Authorization: Bearer TOKEN"
 
 # 5) Update task status

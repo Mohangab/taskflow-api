@@ -4,6 +4,7 @@ import com.taskflow.task.dto.TaskRequest;
 import com.taskflow.task.dto.TaskResponse;
 import com.taskflow.user.User;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -25,9 +26,15 @@ public class TaskController {
     private final TaskService taskService;
 
     @GetMapping
-    @Operation(summary = "List tasks (own tasks for USER; all tasks for ADMIN)")
-    public ResponseEntity<List<TaskResponse>> listTasks(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(taskService.listTasks(user));
+    @Operation(summary = "List tasks (own tasks for USER; all tasks for ADMIN)",
+            description = "Optional filters: status (TODO|IN_PROGRESS|DONE) and q (case-insensitive title contains).")
+    public ResponseEntity<List<TaskResponse>> listTasks(
+            @AuthenticationPrincipal User user,
+            @Parameter(description = "Filter by task status")
+            @RequestParam(required = false) TaskStatus status,
+            @Parameter(description = "Case-insensitive title search")
+            @RequestParam(required = false) String q) {
+        return ResponseEntity.ok(taskService.listTasks(user, status, q));
     }
 
     @GetMapping("/{id}")

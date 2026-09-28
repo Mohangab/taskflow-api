@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -20,9 +21,15 @@ public class TaskService {
 
     @Transactional(readOnly = true)
     public List<TaskResponse> listTasks(User currentUser) {
+        return listTasks(currentUser, null, null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TaskResponse> listTasks(User currentUser, TaskStatus status, String titleQuery) {
+        String q = StringUtils.hasText(titleQuery) ? titleQuery.trim() : null;
         List<Task> tasks = currentUser.getRole() == Role.ADMIN
-                ? taskRepository.findAllByOrderByCreatedAtDesc()
-                : taskRepository.findByOwnerOrderByCreatedAtDesc(currentUser);
+                ? taskRepository.findAllFiltered(status, q)
+                : taskRepository.findByOwnerFiltered(currentUser, status, q);
         return tasks.stream().map(TaskResponse::from).toList();
     }
 
