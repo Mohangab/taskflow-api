@@ -294,6 +294,7 @@ npm run build
 | `APP_JWT_EXPIRATION_MS` | `86400000` (24h) | Access token TTL |
 | `SPRING_DATASOURCE_*` | H2 in-memory | Overridden in Docker profile |
 | `server.port` | `8080` | HTTP port |
+| Actuator health | `/actuator/health` | Liveness probe (public) |
 
 ---
 
