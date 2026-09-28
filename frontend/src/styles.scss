@@ -1,0 +1,46 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+:root {
+  --tf-primary: #4338ca;
+  --tf-primary-dark: #312e81;
+  --bs-primary: #4338ca;
+  --bs-primary-rgb: 67, 56, 202;
+  --bs-link-color: #4338ca;
+  --bs-link-hover-color: #312e81;
+  --bs-body-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --bs-body-bg: #f4f6fb;
+  --bs-body-color: #0f172a;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--bs-body-font-family);
+  background:
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.12), transparent 40%),
+    radial-gradient(circle at 10% 20%, rgba(30, 58, 138, 0.08), transparent 35%),
+    var(--bs-body-bg);
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--tf-primary);
+  --bs-btn-border-color: var(--tf-primary);
+  --bs-btn-hover-bg: var(--tf-primary-dark);
+  --bs-btn-hover-border-color: var(--tf-primary-dark);
+  --bs-btn-active-bg: var(--tf-primary-dark);
+  --bs-btn-active-border-color: var(--tf-primary-dark);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #a5b4fc;
+  box-shadow: 0 0 0 0.2rem rgba(67, 56, 202, 0.15);
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}

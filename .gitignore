@@ -43,3 +43,9 @@ logs/
 *.jar
 !**/src/main/**/lib/*.jar
 !**/src/test/**/lib/*.jar
+
+# Frontend (Angular)
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.vscode/

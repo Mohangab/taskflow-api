@@ -1,0 +1,24 @@
+<nav class="navbar navbar-expand-md tf-navbar sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" routerLink="/">
+      <i class="bi bi-kanban-fill brand-mark"></i>
+      <span>TaskFlow</span>
+    </a>
+
+    <div class="d-flex align-items-center gap-3 ms-auto">
+      <ng-container *ngIf="auth.isAuthenticated(); else guestLinks">
+        <a class="nav-link-soft" routerLink="/tasks" routerLinkActive="active">Tasks</a>
+        <span class="user-chip d-none d-sm-inline">
+          <i class="bi bi-person-circle me-1"></i>{{ auth.email() }}
+        </span>
+        <button type="button" class="btn btn-sm btn-outline-light" (click)="logout()">
+          Log out
+        </button>
+      </ng-container>
+      <ng-template #guestLinks>
+        <a class="btn btn-sm btn-outline-light" routerLink="/login">Sign in</a>
+        <a class="btn btn-sm btn-light text-primary fw-semibold" routerLink="/register">Register</a>
+      </ng-template>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,77 @@
+.board-wrap {
+  max-width: 1100px;
+}
+
+.form-card {
+  border-radius: 1rem;
+}
+
+.filter-chip {
+  border-radius: 999px;
+  border: 1px solid #dde3f0;
+  background: #fff;
+  color: #445;
+  font-weight: 500;
+
+  .count {
+    display: inline-block;
+    margin-left: 0.35rem;
+    min-width: 1.4rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: var(--tf-primary);
+    font-size: 0.75rem;
+  }
+
+  &.active {
+    background: var(--tf-primary);
+    border-color: var(--tf-primary);
+    color: #fff;
+
+    .count {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+  }
+}
+
+.task-card {
+  border-radius: 1rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.75rem 1.5rem rgba(15, 23, 42, 0.08) !important;
+  }
+}
+
+.status-badge {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.badge-todo {
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.badge-progress {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.badge-done {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.status-select {
+  width: auto;
+  min-width: 8.5rem;
+}
+
+.empty-icon {
+  font-size: 2.75rem;
+  color: #94a3b8;
+}

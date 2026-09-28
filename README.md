@@ -21,6 +21,7 @@ TaskFlow lets users register, log in, and manage their personal tasks (`TODO` �
 | Docker | Multi-stage `Dockerfile` + `docker-compose.yml` |
 | Swagger / OpenAPI | springdoc-openapi UI at `/swagger-ui.html` |
 | Maven | Standard multi-module-ready layout, CI-ready |
+| Angular / Bootstrap | SPA in `frontend/` — auth, JWT interceptor, task board |
 
 ---
 
@@ -32,6 +33,7 @@ TaskFlow lets users register, log in, and manage their personal tasks (`TODO` �
 - **springdoc-openapi** (Swagger UI)
 - **Maven** · **Docker** / **Docker Compose**
 - **JUnit 5** + Mockito
+- **Angular 19** · **Bootstrap 5** (SPA in `frontend/`)
 
 ---
 
@@ -39,7 +41,7 @@ TaskFlow lets users register, log in, and manage their personal tasks (`TODO` �
 
 ```mermaid
 flowchart LR
-  Client[Client / curl / Swagger UI]
+  Client[Angular SPA / curl / Swagger UI]
   API[Spring Boot API]
   Sec[JWT Filter + Spring Security]
   Auth[Auth Service]
@@ -103,6 +105,7 @@ Interactive docs: [http://localhost:8080/swagger-ui.html](http://localhost:8080/
 - **JDK 17+** (project targets Java 17; JDK 21 also works)
 - **Maven 3.9+** (or use the included Maven Wrapper after generation)
 - **Docker Desktop / Docker Engine + Compose** (optional, for containerized run)
+- **Node.js 18+** and npm (for the Angular frontend)
 
 ---
 
@@ -216,6 +219,61 @@ curl -s -X PUT http://localhost:8080/api/tasks/1 \
 
 ---
 
+
+## Frontend (Angular)
+
+A polished **Angular 19** SPA lives in [`frontend/`](frontend/). It talks to this API over HTTP with JWT Bearer auth.
+
+### Features
+
+- Register / Login (JWT stored in `localStorage`)
+- Auth guard on task routes + HTTP interceptor (`Authorization: Bearer …`)
+- Task board: create, edit, change status, delete, filter by status
+- Bootstrap 5 UI with loading and error states
+
+### Run locally (two terminals)
+
+**Terminal 1 — API**
+
+```bash
+cd taskflow-api
+mvn spring-boot:run
+```
+
+**Terminal 2 — Angular**
+
+```bash
+cd taskflow-api/frontend
+npm install
+npm start
+```
+
+Open **http://localhost:4200** — register a user, then manage tasks.
+
+The Angular app calls `http://localhost:8080` (see `frontend/src/environments/environment.ts`). Spring Security CORS allows the Angular origin `http://localhost:4200`.
+
+### Production / proxy tip
+
+Serve the Angular build behind nginx (or Spring static resources) and reverse-proxy `/api` to the backend so the browser uses same-origin requests. Then set `apiUrl` to `''` in the environment file. Example nginx snippet:
+
+```nginx
+location /api/ {
+  proxy_pass http://app:8080/api/;
+}
+location / {
+  try_files $uri $uri/ /index.html;
+}
+```
+
+Build the SPA with:
+
+```bash
+cd frontend
+npm run build
+# output → frontend/dist/frontend/browser
+```
+
+---
 ## Configuration
 
 | Property / Env var | Default (local) | Description |
@@ -250,6 +308,10 @@ taskflow-api/
 ├── pom.xml
 ├── README.md
 ├── .github/workflows/ci.yml
+├── frontend/                 # Angular 19 SPA
+│   ├── src/app/
+│   ├── src/environments/
+│   └── package.json
 └── src/
     ├── main/java/com/taskflow/...
     ├── main/resources/
@@ -266,4 +328,4 @@ MIT — feel free to fork for learning or interview prep.
 
 ---
 
-<sub>Built to demonstrate Java Full Stack skills: Spring Boot 3 · Spring Security · JWT · RBAC · REST · JPA · PostgreSQL · Docker · OpenAPI.</sub>
+<sub>Built to demonstrate Java Full Stack skills: Spring Boot 3 · Angular · Spring Security · JWT · RBAC · REST · JPA · PostgreSQL · Docker · OpenAPI · Bootstrap.</sub>
