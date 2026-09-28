@@ -1,6 +1,6 @@
 # TaskFlow API
 
-> A production-style **Task Management REST API** built with **Spring Boot 3**, **JWT authentication**, and **role-based access control (RBAC)**. Designed as a clean, GitHub-ready portfolio project for a Java Full Stack Developer resume.
+> A production-style **Task Management REST API** built with **Spring Boot 3**, **JWT authentication**, and **role-based access control (RBAC)**. Designed to maintain and schedule tasks.
 
 **Author:** Kola Mohan Venkatesh ([@Mohangab](https://github.com/Mohangab))
 
