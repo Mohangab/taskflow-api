@@ -191,9 +191,13 @@ docker compose up --build -d app
 
 # Open a shell inside the API container
 docker compose exec app sh
+
+# Confirm the app healthcheck is green
+docker compose ps
+curl -s http://localhost:8080/actuator/health
 ```
 
-The Compose file injects database credentials and the JWT secret via **environment variables** — nothing sensitive is hardcoded in source.
+The Compose file injects database credentials and the JWT secret via **environment variables** — nothing sensitive is hardcoded in source. Both Postgres and the API declare **healthchecks**; the API waits for a healthy database before starting.
 
 ---
 

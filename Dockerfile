@@ -18,13 +18,19 @@ RUN mvn -B package -DskipTests
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
-# Non-root user for better security hygiene
-RUN groupadd --system app && useradd --system --gid app app
+# curl for HEALTHCHECK; non-root user for better security hygiene
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system app && useradd --system --gid app app
 USER app
 
 COPY --from=build /app/target/taskflow-api-*.jar /app/app.jar
 
 EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+  CMD curl -fsS http://127.0.0.1:8080/actuator/health | grep -q UP || exit 1
 
 # JVM container-aware flags
 ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "/app/app.jar"]
