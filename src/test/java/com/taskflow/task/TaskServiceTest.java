@@ -20,6 +20,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -78,23 +80,52 @@ class TaskServiceTest {
                 .updatedAt(Instant.now())
                 .build();
 
-        when(taskRepository.findByOwnerOrderByCreatedAtDesc(alice)).thenReturn(List.of(own));
+        when(taskRepository.findByOwnerFiltered(eq(alice), isNull(), isNull())).thenReturn(List.of(own));
 
         List<TaskResponse> result = taskService.listTasks(alice);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getTitle()).isEqualTo("Mine");
-        verify(taskRepository, never()).findAllByOrderByCreatedAtDesc();
+        verify(taskRepository, never()).findAllFiltered(any(), any());
     }
 
     @Test
     void listTasks_adminSeesAllTasks() {
-        when(taskRepository.findAllByOrderByCreatedAtDesc()).thenReturn(List.of());
+        when(taskRepository.findAllFiltered(isNull(), isNull())).thenReturn(List.of());
 
         taskService.listTasks(admin);
 
-        verify(taskRepository).findAllByOrderByCreatedAtDesc();
-        verify(taskRepository, never()).findByOwnerOrderByCreatedAtDesc(any());
+        verify(taskRepository).findAllFiltered(isNull(), isNull());
+        verify(taskRepository, never()).findByOwnerFiltered(any(), any(), any());
+    }
+
+    @Test
+    void listTasks_appliesStatusAndTitleFiltersForUser() {
+        Task match = Task.builder()
+                .id(3L)
+                .title("Ship portfolio")
+                .status(TaskStatus.TODO)
+                .owner(alice)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build();
+
+        when(taskRepository.findByOwnerFiltered(alice, TaskStatus.TODO, "portfolio"))
+                .thenReturn(List.of(match));
+
+        List<TaskResponse> result = taskService.listTasks(alice, TaskStatus.TODO, "  portfolio  ");
+
+        assertThat(result).extracting(TaskResponse::getTitle).containsExactly("Ship portfolio");
+        verify(taskRepository).findByOwnerFiltered(alice, TaskStatus.TODO, "portfolio");
+    }
+
+    @Test
+    void listTasks_blankQueryTreatedAsNoTitleFilter() {
+        when(taskRepository.findAllFiltered(TaskStatus.DONE, null)).thenReturn(List.of());
+
+        taskService.listTasks(admin, TaskStatus.DONE, "   ");
+
+        verify(taskRepository).findAllFiltered(TaskStatus.DONE, null);
     }
 
     @Test
