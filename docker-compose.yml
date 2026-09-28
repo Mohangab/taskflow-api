@@ -1,0 +1,41 @@
+# TaskFlow API + PostgreSQL
+# Usage:  docker compose up --build
+# Docs:   see README.md  →  "Run with Docker"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: taskflow-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-taskflow}
+      POSTGRES_USER: ${POSTGRES_USER:-taskflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-taskflow}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - taskflow_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-taskflow} -d ${POSTGRES_DB:-taskflow}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: taskflow-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-taskflow}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-taskflow}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-taskflow}
+      APP_JWT_SECRET: ${APP_JWT_SECRET:-TaskFlowDockerSecretKeyMustBeAtLeast32Bytes!}
+      APP_JWT_EXPIRATION_MS: ${APP_JWT_EXPIRATION_MS:-86400000}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    restart: unless-stopped
+
+volumes:
+  taskflow_pgdata:
